@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
+import { CategoryForm } from "./_components/category-form";
 import { DescriptionForm } from "./_components/description-form";
 import { ImageForm } from "./_components/image-form";
 import { TitleForm } from "./_components/title-form";
@@ -19,6 +20,13 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
       id: params.courseId,
     },
   });
+
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+  console.log(categories);
 
   if (!course) {
     return redirect("/");
@@ -58,6 +66,14 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
             courseId={course.id}
           ></DescriptionForm>
           <ImageForm initialData={course} courseId={course.id}></ImageForm>
+          <CategoryForm
+            initialData={course}
+            courseId={course.id}
+            options={categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+          ></CategoryForm>
         </div>
       </div>
     </div>
